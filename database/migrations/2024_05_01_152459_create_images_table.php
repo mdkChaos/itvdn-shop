@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('galleries', function (Blueprint $table) {
+        Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('product_id')->unsigned()->nullable();
+            $table->integer('gallery_id')->nullable();
+            $table->string('path')->nullable();
             $table->timestamps();
-            $table->foreign('product_id')->references('id')->on('products');
         });
     }
 
@@ -24,9 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('galleries', function(Blueprint $table) {
-            $table->dropForeign('galleries_product_id_foreign');
-        });
-        Schema::dropIfExists('galleries');
+        Schema::dropIfExists('images');
     }
 };
