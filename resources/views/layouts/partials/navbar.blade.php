@@ -1,5 +1,5 @@
 <!-- Navbar -->
-<nav class="navbar fixed-top navbar-expand-lg navbar-light white scrolling-navbar">
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-white scrolling-navbar">
     <div class="container">
 
         <!-- Brand -->
@@ -19,7 +19,7 @@
         </button>
 
         <!-- Links -->
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse d-flex" id="navbarSupportedContent">
             <!-- Left -->
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
@@ -27,7 +27,16 @@
                 </li>
             </ul>
             <!-- Right -->
-            <ul class="navbar-nav nav-flex-icons">
+            <ul class="navbar-nav nav-flex-icons ms-auto">
+                @if(Cart::count() > 0)
+                    <li class="nav-item">
+                        <a href="{{ route('cart.index') }}" class="nav-link waves-effect">
+                            <span class="badge text-bg-danger z-depth-1 mr-1">{{ Cart::count() }}</span>
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="clearfix d-none d-sm-inline-block">Cart</span>
+                        </a>
+                    </li>
+                @endif
                 <!-- Authentication Links -->
                 @guest
                     <li class="nav-item">
