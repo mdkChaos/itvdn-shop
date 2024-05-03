@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title') Cart @endsection
+@section('title', 'Cart')
 
 @section('content')
     <div class="container wow fadeIn">
@@ -8,7 +8,7 @@
 
         @if(Cart::count() > 0)
             <table class="table table-striped">
-                <thead class="black white-text">
+                <thead class="bg-dark text-white">
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Product</th>
@@ -25,8 +25,8 @@
                         <td>{{ $item->name }}</td>
                         <td>
                             <form action="{{ route('cart.update') }}" method="post">
-                                {!! method_field('patch') !!}
-                                {!! csrf_field() !!}
+                                @method('patch')
+                                @csrf
                                 <input type="hidden" name="productId" value="{{ $item->rowId }}">
                                 <input type="number" name="qty" value="{{ $item->qty }}" min="1">
                                 <button class="btn btn-sm btn-primary" type="submit">Update</button>
@@ -46,8 +46,8 @@
                 </tr>
                 </tfoot>
             </table>
-            <a href="{{ route('cart.destroy') }}" class="btn-danger btn btn-lg">Clear cart</a>
-            <a href="{{ route('cart.checkout') }}" class="btn-success btn btn-lg">
+            <a href="{{ route('cart.destroy') }}" class="btn btn-danger btn-lg">Clear cart</a>
+            <a href="{{ route('cart.checkout') }}" class="btn btn-success btn-lg">
                 Checkout <i class="fa fa-arrow-right"></i>
             </a>
         @else
@@ -56,10 +56,10 @@
                     <p class="text-warning">Do you like our products?</p>
                 </blockquote>
                 <figcaption class="blockquote-footer ms-3">
-                    Your cart is empty now. You can choose product in our <a href="{{ url('catalog') }}">catalog</a> and
+                    Your cart is empty now. You can choose products in our <a href="{{ url('catalog') }}">catalog</a> and
                     enjoy them!
                 </figcaption>
             </figure>
         @endif
     </div>
-@stop
+@endsection

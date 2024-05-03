@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
-@section('title')
-    Catalog
-@endsection
+@section('title', 'Catalog')
 
 @section('content')
     <div class="container-fluid">
@@ -11,10 +9,8 @@
                 @include('catalog.card', compact('product'))
             @endforeach
         </div>
-
-
-                <div class="d-flex justify-content-center">
-                    {{ $products->links() }}
-                </div>
+        <div class="d-flex justify-content-center">
+            {{ $products->links() }}
+        </div>
     </div>
 @endsection
