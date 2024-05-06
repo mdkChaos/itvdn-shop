@@ -12,14 +12,23 @@ use Illuminate\Support\Str;
 class ProductFactory extends Factory
 {
     /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Product::class;
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
+        $title = fake()->numerify('Product ###');
         return [
-            'title' => fake()->numerify('Product ###'),
+            'title' => $title,
+            'slug' => Str::slug($title),
             'description' => fake()->paragraphs(4, true),
             'price' => fake()->randomFloat(2, 10, 999),
             'barcode' => fake()->ean8(),
@@ -36,21 +45,8 @@ class ProductFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (Product $product) {
-            $this->generateSlug($product);
             $this->syncCategories($product);
         });
-    }
-
-    /**
-     * Generate slug for the product.
-     *
-     * @param  Product  $product
-     * @return void
-     */
-    protected function generateSlug(Product $product): void
-    {
-        $product->slug = Str::slug($product->title);
-        $product->save();
     }
 
     /**

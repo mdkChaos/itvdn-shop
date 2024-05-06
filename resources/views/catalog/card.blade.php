@@ -9,11 +9,11 @@
                 @foreach($product->categories as $category)
                     <a href="" class="badge
                         @switch($category->id)
-                            @case(1) text-primary @break
-                            @case(2) text-info @break
-                            @case(3) text-danger @break
-                            @case(4) text-warning @break
-                            @case(5) text-success @break
+                            @case(1) bg-primary @break
+                            @case(2) bg-secondary @break
+                            @case(3) bg-danger @break
+                            @case(4) bg-dark @break
+                            @case(5) bg-success @break
                         @endswitch
                         mr-1">{{ $category->name }}</a>
                 @endforeach
