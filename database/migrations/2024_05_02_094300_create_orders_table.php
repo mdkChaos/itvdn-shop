@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('comment')->nullable();
             $table->float('total', 10, 2)->default(0.00);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

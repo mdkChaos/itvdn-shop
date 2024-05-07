@@ -5,27 +5,23 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use App\Models\User;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 
 class OrderController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $orders = Order::paginate();
+        $trashedOrders = Order::onlyTrashed()->get();
+        return view('admin.orders.index', compact('orders', 'trashedOrders'));
     }
 
     /**
@@ -51,7 +47,6 @@ class OrderController extends Controller
                 'quantity' => $cartRow->qty,
             ]);
         }
-
         if ($request->has('updateUser')) {
             $user = auth()->guest() ? User::where('email', $request->customerEmail)->first() : auth()->user();
 
@@ -80,30 +75,50 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+        $orderItems = OrderItem::where('order_id', $order->id)->with('product')->get();
+        $productIds = $orderItems->pluck('product_id')->unique()->toArray();
+        $products = Product::whereIn('id', $productIds)->get();
+
+        $orderItems->map(function ($orderItem) use ($products) {
+            $product = $products->where('id', $orderItem->product_id)->first();
+            $orderItem->product = $product;
+            return $orderItem;
+        });
+
+        return view('admin.orders.show', compact('order', 'orderItems'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Delete the specified resource from storage.
      */
-    public function edit(Order $order)
+    public function delete(Order $order): RedirectResponse
     {
-        //
+        $order->delete();
+
+        return redirect()->route('admin.orders.index');
     }
 
     /**
-     * Update the specified resource in storage.
+     * Restore the specified resource from storage.
      */
-    public function update(Request $request, Order $order)
+    public function restore(int $id): RedirectResponse
     {
-        //
+        $order = Order::onlyTrashed()->whereId($id)->first();
+        Gate::authorize('restore', $order);
+        $order->restore();
+
+        return redirect()->route('admin.orders.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Order $order)
+    public function destroy(int $id): RedirectResponse
     {
-        //
+        $order = Order::onlyTrashed()->whereId($id)->first();
+        Gate::authorize('forceDelete', $order);
+        $order->forceDelete();
+
+        return redirect()->route('admin.orders.index');
     }
 }

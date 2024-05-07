@@ -15,7 +15,7 @@ class AdminPanelMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->user()->is_admin || !auth()->user()->is_manager) {
+        if (!auth()->user()->is_admin && !auth()->user()->is_manager) {
             abort(404);
         }
         return $next($request);

@@ -52,7 +52,9 @@ Route::middleware(['auth', 'admin-panel'])->prefix('admin-panel')->group(callbac
     //Orders
     Route::name('admin.orders.')->prefix('orders')->controller(OrderController::class)->group(callback: function (): void {
         Route::get('/', 'index')->name('index');
-        Route::get('show/{id}', 'show')->name('show');
-        Route::get('delete/{id}', 'delete')->name('delete');
+        Route::get('show/{order}', 'show')->name('show');
+        Route::get('delete/{order}', 'delete')->name('delete');
+        Route::get('drop/{id}', 'destroy')->name('destroy');
+        Route::get('restore/{id}', 'restore')->name('restore');
     });
 });
