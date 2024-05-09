@@ -6,6 +6,7 @@ use App\Http\Requests\ProductFormRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\ProductService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -92,6 +93,7 @@ class ProductController extends Controller
     /**
      * @param int $id
      * @return RedirectResponse
+     * @return AuthorizationException
      */
     public function restore(int $id): RedirectResponse
     {
@@ -106,6 +108,7 @@ class ProductController extends Controller
     /**
      * @param int $id
      * @return RedirectResponse
+     * @return AuthorizationException
      */
     public function destroy(int $id): RedirectResponse
     {

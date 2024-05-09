@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\EditUserRequest;
 use App\Models\User;
+use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserService
@@ -37,6 +38,7 @@ class UserService
     /**
      * @param User $user
      * @return void
+     * @throws Exception
      */
     public function deleteUser(User $user): void
     {

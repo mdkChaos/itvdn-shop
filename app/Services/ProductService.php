@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\ProductFormRequest;
 use App\Models\Product;
+use Exception;
 
 class ProductService
 {
@@ -37,6 +38,7 @@ class ProductService
     /**
      * @param Product $product
      * @return void
+     * @throws Exception
      */
     public function deleteProduct(Product $product): void
     {
