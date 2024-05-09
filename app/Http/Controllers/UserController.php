@@ -4,44 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EditUserRequest;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class UserController extends Controller
 {
+    private UserService $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
+    /**
+     * @return View
+     */
     public function index(): View
     {
-        $users = User::paginate();
+        $users = $this->userService->getUsers();
 
         return view('admin.users.index', compact('users'));
     }
 
+    /**
+     * @param User $user
+     * @return View
+     */
     public function edit(User $user): View
     {
         return view('admin.users.edit', compact('user'));
     }
 
+    /**
+     * @param EditUserRequest $request
+     * @param User $user
+     * @return RedirectResponse
+     */
     public function update(EditUserRequest $request, User $user): RedirectResponse
     {
         Gate::authorize('update', $user);
-        $user->update(attributes: [
-            'name' => $request->get('name'),
-            'lastname' => $request->get('lastname'),
-            'email' => $request->get('email'),
-            'phone' => $request->get('phone'),
-            'address' => $request->get('address'),
-            'is_admin' => (bool)$request->get('is_admin'),
-            'is_manager' => (bool)$request->get('is_manager'),
-        ]);
+        $this->userService->updateUser($request, $user);
 
         return redirect()->route('admin.users.index');
     }
 
+    /**
+     * @param User $user
+     * @return RedirectResponse
+     */
     public function destroy(User $user): RedirectResponse
     {
         Gate::authorize('update', $user);
-        $user->delete();
+        $this->userService->deleteUser($user);
 
         return redirect()->route('admin.users.index');
     }

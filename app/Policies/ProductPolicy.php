@@ -11,6 +11,9 @@ class ProductPolicy
 
     /**
      * Determine whether the user can restore the product.
+     *
+     * @param User $user
+     * @return bool
      */
     public function restore(User $user): bool
     {
@@ -19,6 +22,9 @@ class ProductPolicy
 
     /**
      * Determine whether the user can permanently delete the product.
+     *
+     * @param User $user
+     * @return bool
      */
     public function forceDelete(User $user): bool
     {

@@ -4,121 +4,89 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Product;
-use App\Models\User;
-use Gloudemans\Shoppingcart\Facades\Cart;
+use App\Services\OrderService;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class OrderController extends Controller
 {
+    private OrderService $orderService;
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(): View
     {
-        $orders = Order::paginate();
-        $trashedOrders = Order::onlyTrashed()->get();
-        return view('admin.orders.index', compact('orders', 'trashedOrders'));
+        $result = $this->orderService->getOrders();
+
+        return view('admin.orders.index', $result);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @param StoreOrderRequest $request
+     * @return RedirectResponse
      */
     public function store(StoreOrderRequest $request): RedirectResponse
     {
-        $order = Order::create([
-            'customerName' => $request->customerName,
-            'customerLastName' => $request->customerLastName,
-            'customerEmail' => $request->customerEmail,
-            'customerPhone' => $request->customerPhone,
-            'customerAddress' => $request->customerAddress,
-            'comment' => $request->customerComment,
-            'total' => Cart::total(),
-        ]);
-
-        foreach (Cart::content() as $cartRow) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $cartRow->id,
-                'price' => $cartRow->price,
-                'quantity' => $cartRow->qty,
-            ]);
-        }
-        if ($request->has('updateUser')) {
-            $user = auth()->guest() ? User::where('email', $request->customerEmail)->first() : auth()->user();
-
-            if (!is_null($user)) {
-                $user->update([
-                    'name' => $request->customerName,
-                    'lastname' => $request->customerLastName,
-                    'email' => $request->customerEmail,
-                    'phone' => $request->customerPhone,
-                    'address' => $request->customerAddress,
-                ]);
-
-                $order->update([
-                    'user_id' => $user->id,
-                ]);
-            }
-        }
-
-        Cart::destroy();
+        $order = $this->orderService->storeOrder($request);
 
         return redirect()->route('cart.success', ['orderId' => $order->id]);
     }
 
     /**
-     * Display the specified resource.
+     * @param Order $order
+     * @return View
      */
-    public function show(Order $order)
+    public function show(Order $order): View
     {
-        $orderItems = OrderItem::where('order_id', $order->id)->with('product')->get();
-        $productIds = $orderItems->pluck('product_id')->unique()->toArray();
-        $products = Product::whereIn('id', $productIds)->get();
-
-        $orderItems->map(function ($orderItem) use ($products) {
-            $product = $products->where('id', $orderItem->product_id)->first();
-            $orderItem->product = $product;
-            return $orderItem;
-        });
+        $orderItems = $this->orderService->showOrder($order);
 
         return view('admin.orders.show', compact('order', 'orderItems'));
     }
 
     /**
-     * Delete the specified resource from storage.
+     * @param Order $order
+     * @return RedirectResponse
      */
     public function delete(Order $order): RedirectResponse
     {
-        $order->delete();
+        $this->orderService->deleteOrder($order);
 
-        return redirect()->route('admin.orders.index');
+        return back();
     }
 
     /**
-     * Restore the specified resource from storage.
+     * @param int $id
+     * @return RedirectResponse
      */
     public function restore(int $id): RedirectResponse
     {
         $order = Order::onlyTrashed()->whereId($id)->first();
         Gate::authorize('restore', $order);
-        $order->restore();
 
-        return redirect()->route('admin.orders.index');
+        $this->orderService->restoreOrder($order);
+
+        return back();
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @param int $id
+     * @return RedirectResponse
      */
     public function destroy(int $id): RedirectResponse
     {
         $order = Order::onlyTrashed()->whereId($id)->first();
         Gate::authorize('forceDelete', $order);
-        $order->forceDelete();
 
-        return redirect()->route('admin.orders.index');
+        $this->orderService->destroyOrder($order);
+
+        return back();
     }
 }

@@ -11,11 +11,17 @@ class Gallery extends Model
 {
     use HasFactory;
 
+    /**
+     * @return BelongsTo
+     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
+    /**
+     * @return HasMany
+     */
     public function images(): HasMany
     {
         return $this->hasMany(Image::class);

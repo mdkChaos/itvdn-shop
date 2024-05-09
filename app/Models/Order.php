@@ -23,11 +23,17 @@ class Order extends Model
         'total',
     ];
 
+    /**
+     * @return BelongsTo
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return HasMany
+     */
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);

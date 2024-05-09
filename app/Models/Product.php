@@ -23,15 +23,25 @@ class Product extends Model
         'cover'
     ];
 
+    /**
+     * @return BelongsToMany
+     */
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class);
     }
 
+    /**
+     * @return HasOne
+     */
     public function gallery(): HasOne
     {
         return $this->hasOne(Gallery::class);
     }
+
+    /**
+     * @return HasMany
+     */
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);

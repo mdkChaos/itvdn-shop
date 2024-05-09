@@ -5,25 +5,33 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProductFormRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\ProductService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ProductController extends Controller
 {
+    private ProductService $productService;
+
+    public function __construct(ProductService $productService)
+    {
+        $this->productService = $productService;
+    }
+
     /**
-     * Display a listing of the resource.
+     * @return View
      */
     public function index(): View
     {
         $products = Product::with(['categories'])->paginate();
         $trashedProducts = Product::onlyTrashed()->get();
+
         return view('admin.products.index', compact('products', 'trashedProducts'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * @return View
      */
     public function create(): View
     {
@@ -35,20 +43,19 @@ class ProductController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @param ProductFormRequest $request
+     * @return RedirectResponse
      */
     public function store(ProductFormRequest $request): RedirectResponse
     {
-        $request->merge(['slug' => Str::slug($request->input('title'))]);
-        $product = Product::create($request->all());
-        $categoryIds = $request->input('categories', []);
-        $product->categories()->attach($categoryIds);
+        $this->productService->storeProduct($request);
 
         return redirect()->route('admin.products.index');
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * @param Product $product
+     * @return View
      */
     public function edit(Product $product): View
     {
@@ -60,49 +67,53 @@ class ProductController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @param ProductFormRequest $request
+     * @param Product $product
+     * @return RedirectResponse
      */
     public function update(ProductFormRequest $request, Product $product): RedirectResponse
     {
-        $request->merge(['slug' => Str::slug($request->input('title'))]);
-        $product->update($request->all());
-        $categoryIds = $request->input('categories', []);
-        $product->categories()->sync($categoryIds);
+        $this->productService->updateProduct($request, $product);
 
         return redirect()->route('admin.products.index');
     }
 
     /**
-     * Delete the specified resource from storage.
+     * @param Product $product
+     * @return RedirectResponse
      */
     public function delete(Product $product): RedirectResponse
     {
-        $product->delete();
+        $this->productService->deleteProduct($product);
 
-        return redirect()->route('admin.products.index');
+        return back();
     }
 
     /**
-     * Restore the specified resource from storage.
+     * @param int $id
+     * @return RedirectResponse
      */
     public function restore(int $id): RedirectResponse
     {
         $product = Product::onlyTrashed()->whereId($id)->first();
         Gate::authorize('restore', $product);
-        $product->restore();
 
-        return redirect()->route('admin.products.index');
+        $this->productService->restoreProduct($product);
+
+        return back();
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @param int $id
+     * @return RedirectResponse
      */
     public function destroy(int $id): RedirectResponse
     {
         $product = Product::onlyTrashed()->whereId($id)->first();
         Gate::authorize('forceDelete', $product);
-        $product->forceDelete();
 
-        return redirect()->route('admin.products.index');
+        $this->productService->destroyProduct($product);
+
+        return back();
     }
 }

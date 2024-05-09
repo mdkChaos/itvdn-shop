@@ -1,4 +1,4 @@
-<!-- Navbar -->
+    <!-- Navbar -->
 <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-white scrolling-navbar">
     <div class="container">
 
@@ -48,6 +48,9 @@
                         @endif
                     </li>
                 @else
+                    <li class="nav-item">
+                        <a href="{{ route('admin.index') }}" class="nav-link">Admin Panel</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

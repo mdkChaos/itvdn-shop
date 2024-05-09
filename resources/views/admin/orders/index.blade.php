@@ -70,10 +70,10 @@
                         @foreach($trashedOrders as $trashedOrder)
                             @canany(['can-order-destroy', 'can-order-restore'], $trashedOrder)
                                 <tr>
-                                    <td>{{ $order->getKey() }}</td>
-                                    <td>{{ $order->customerName }}</td>
-                                    <td>{{ $order->customerLastName }}</td>
-                                    <td>${{ $order->total }}</td>
+                                    <td>{{ $trashedOrder->getKey() }}</td>
+                                    <td>{{ $trashedOrder->customerName }}</td>
+                                    <td>{{ $trashedOrder->customerLastName }}</td>
+                                    <td>${{ $trashedOrder->total }}</td>
                                     <td>
                                         <div class="btn-group">
                                             <a href="{{ route('admin.orders.restore', ['id' => $trashedOrder->getKey()]) }}" class="btn btn-warning">Restore</a>

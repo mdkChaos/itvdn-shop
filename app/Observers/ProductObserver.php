@@ -9,6 +9,9 @@ class ProductObserver
 {
     /**
      * Handle the Product "created" event.
+     *
+     * @param Product $product
+     * @return void
      */
     public function created(Product $product): void
     {
@@ -17,6 +20,9 @@ class ProductObserver
 
     /**
      * Handle the Product "updated" event.
+     *
+     * @param Product $product
+     * @return void
      */
     public function updated(Product $product): void
     {

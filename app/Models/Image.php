@@ -10,7 +10,12 @@ class Image extends Model
 {
     use HasFactory;
 
+
     protected $fillable = ['gallery_id', 'path'];
+
+    /**
+     * @return BelongsTo
+     */
     public function gallery(): BelongsTo
     {
         return $this->belongsTo(Gallery::class);
