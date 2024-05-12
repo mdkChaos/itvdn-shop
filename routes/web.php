@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/');
+})->name('logout');
+
 Route::get('/', [PageController::class, 'index'])->name('index');
 
 Route::name('cart.')->prefix('cart')->controller(CartController::class)->group(callback: function (): void {
