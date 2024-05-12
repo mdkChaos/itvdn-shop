@@ -5,9 +5,18 @@ namespace App\Services;
 use App\Http\Requests\ProductFormRequest;
 use App\Models\Product;
 use Exception;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductService
 {
+    /**
+     * @return LengthAwarePaginator
+     */
+    public function getProducts(): LengthAwarePaginator
+    {
+        return Product::paginate();
+    }
+
     /**
      * @param ProductFormRequest $request
      * @return void
